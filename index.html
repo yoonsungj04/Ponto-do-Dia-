@@ -1,0 +1,139 @@
+<!doctype html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>Ponto do Dia</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Caprasimo&family=Figtree:wght@400;600;700&display=swap" rel="stylesheet">
+<style>
+:root{
+  --cream:#f5ead8; --navy:#002776; --navy-h:#0a3a9e; --navy-a:#001b52;
+  --green:#009739; --green-d:#00432a; --yellow:#ffdf00; --yellow-a:#e6c800; --ink:#201e1d;
+  --display:Caprasimo,Georgia,serif;
+  --sans:Figtree,system-ui,-apple-system,"Segoe UI",sans-serif;
+}
+*{box-sizing:border-box;margin:0;padding:0}
+html,body{height:100%;overflow:hidden}
+body{background:var(--cream);color:var(--navy);font-family:var(--sans);-webkit-font-smoothing:antialiased}
+
+/* trama de meio-tom */
+.grain{position:fixed;inset:0;z-index:5;pointer-events:none;mix-blend-mode:multiply;opacity:.5;
+  background-image:radial-gradient(rgba(32,30,29,.22) 1px,transparent 1.1px);background-size:4px 4px}
+
+.meta{font-family:var(--sans);font-weight:600;font-size:clamp(9px,.95vw,10px);line-height:1;
+  letter-spacing:.34em;text-transform:uppercase}
+
+.page{position:relative;z-index:2;height:100dvh;display:flex;flex-direction:column;
+  padding:clamp(18px,3.4vh,44px) clamp(18px,4vw,56px) clamp(16px,3vh,40px)}
+
+/* ---- topo ---- */
+.top{display:flex;justify-content:space-between;align-items:flex-start;gap:clamp(14px,3vw,40px)}
+.top .right{display:flex;gap:clamp(14px,2vw,26px);flex:none}
+.top a{color:inherit;text-decoration:none;border-bottom:2px solid var(--yellow);padding-bottom:2px}
+.top a:hover{background:var(--yellow)}
+
+h1{font-family:var(--display);font-weight:400;color:var(--navy);
+  font-size:clamp(34px,6vw,84px);line-height:.86;letter-spacing:-.02em;
+  margin:clamp(10px,2.2vh,22px) 0 0}
+
+/* ---- a quadra ---- */
+.court{flex:1;min-height:0;position:relative;background:var(--green);border-radius:28px;
+  overflow:hidden;margin-top:clamp(12px,3vh,30px)}
+.court .line{position:absolute;inset:clamp(12px,2vw,22px);border:3px solid var(--cream);border-radius:10px;pointer-events:none}
+.court .ball{position:absolute;right:clamp(26px,5vw,56px);top:clamp(20px,4.4vh,42px);
+  width:clamp(40px,5.4vw,74px);aspect-ratio:1;border-radius:999px;background:var(--yellow);
+  overflow:hidden;z-index:2}
+.court .ball #fill{position:absolute;left:0;right:0;bottom:0;height:0;background:var(--yellow-a);
+  display:block;will-change:height}
+#state{position:absolute;left:clamp(26px,3.4vw,40px);top:clamp(24px,4.6vh,44px);color:var(--cream);opacity:.85;z-index:2}
+.center{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;
+  justify-content:center;gap:clamp(10px,2vh,20px);padding:clamp(52px,9vh,86px) clamp(26px,7vw,90px)}
+
+#theme{font-family:var(--display);font-weight:400;color:var(--cream);text-align:center;
+  font-size:clamp(24px,4.6vw,60px);line-height:1.02;letter-spacing:-.01em;text-wrap:balance}
+#theme.long{font-size:clamp(21px,3.6vw,46px)}
+#theme.xlong{font-size:clamp(18px,2.9vw,37px)}
+#clock{font-family:var(--display);font-weight:400;color:var(--cream);
+  font-size:clamp(64px,13vw,168px);line-height:.84;letter-spacing:-.03em;font-variant-numeric:tabular-nums}
+#sub{color:var(--cream);opacity:.8;text-align:center;max-width:44ch}
+
+/* o que aparece em cada momento */
+#clock{display:none}
+#sub{display:none}
+body[data-phase="study"] #theme,
+body[data-phase="speech"] #theme{display:none}
+body[data-phase="study"] #clock,
+body[data-phase="speech"] #clock,
+body[data-phase="ready"]  #clock{display:block}
+body[data-phase="ready"]  #clock{font-size:clamp(34px,5vw,62px);opacity:.6}
+body[data-phase="study"] #sub,
+body[data-phase="speech"] #sub,
+body[data-phase="done"]   #sub,
+body[data-phase="drawn"]  #sub{display:block}
+body[data-phase="idle"] .court,
+body[data-phase="done"] .court{cursor:pointer}
+
+/* ---- controles ---- */
+.controls{display:flex;align-items:center;gap:clamp(12px,2vw,28px);margin-top:clamp(14px,3vh,34px)}
+#acts{display:flex;gap:clamp(8px,1.2vw,14px);flex:none}
+.rule{flex:1;height:3px;background:var(--navy);min-width:12px}
+.pill{font-family:var(--display);font-weight:400;cursor:pointer;border:3px solid transparent;
+  font-size:clamp(13px,1.5vw,17px);letter-spacing:.06em;border-radius:999px;
+  padding:clamp(12px,1.9vh,19px) clamp(20px,2.6vw,44px);
+  background:transparent;color:var(--navy);border-color:var(--navy);white-space:nowrap;
+  transition:background .12s,color .12s,border-color .12s}
+.pill:hover{background:var(--navy);color:var(--cream)}
+.pill.primary{background:var(--navy);color:var(--cream)}
+.pill.primary:hover{background:var(--navy-h);border-color:var(--navy-h)}
+.pill.primary:active{background:var(--navy-a);border-color:var(--navy-a)}
+.pill:focus-visible{outline:2px solid var(--yellow);outline-offset:3px}
+a.pill{text-decoration:none;flex:none}
+
+@media(max-width:760px){
+  .top{flex-direction:column;gap:10px}
+  .top .right{gap:16px}
+  .controls{flex-wrap:wrap;gap:10px}
+  .rule{display:none}
+  #acts{flex:1;flex-direction:column}
+  #acts .pill{width:100%}
+  a.pill{width:100%;text-align:center}
+}
+@media(prefers-reduced-motion:reduce){*{transition:none!important}}
+</style>
+</head>
+<body data-phase="idle">
+<div class="grain"></div>
+
+<div class="page">
+
+  <div class="top meta">
+    <span>Falando de tênis até encontrar o João Fonseca</span>
+  </div>
+
+  <h1>Ponto<br>do dia</h1>
+
+  <div class="court" data-draw>
+    <div class="line"></div>
+    <div class="ball"><i id="fill"></i></div>
+    <span class="meta" id="state">Sorteio do dia</span>
+    <div class="center">
+      <div id="theme">Aperte sortear</div>
+      <div id="clock">15:00</div>
+      <div class="meta" id="sub"></div>
+    </div>
+  </div>
+
+  <div class="controls">
+    <div id="acts"></div>
+    <div class="rule"></div>
+    <a class="pill" href="https://tally.so/r/Np1RQW" target="_blank" rel="noopener">Sugerir um tema</a>
+  </div>
+
+</div>
+
+<script src="data/themes.js"></script>
+<script src="app.js"></script>
+</body>
+</html>
